@@ -1,0 +1,19 @@
+{
+  "name": "mermaid-docx",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@mermaid-js/mermaid-cli": "^10.4.0",
+    "mermaid-filter": "^1.4.7",
+    "pandoc": "^0.2.0",
+    "pandoc-filter": "^2.2.0",
+    "puppeteer": "^22.8.2"
+  }
+}
