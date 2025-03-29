@@ -1,0 +1,52 @@
+classDiagram
+    class CryptographicVerificationFramework {
+        +generateCoupon(offerId, constraints)
+        +validateCoupon(couponCode, transactionContext)
+        +recordRedemption(couponCode, redemptionProof)
+        +verifyRedemptionProof(redemptionProof)
+        +generateEffectivenessMetrics(offerId)
+    }
+
+    class CouponGenerator {
+        +createCouponCode(offerId, constraints)
+        +createBatchCoupons(offerId, count, constraints)
+        +generateRedemptionKey(couponCode)
+        +createTargetedCoupon(offerId, userPreferences)
+    }
+
+    class CouponValidator {
+        +verifyCouponAuthenticity(couponCode)
+        +checkConstraints(couponCode, context)
+        +detectDoubleSpending(couponCode)
+        +validateRedemptionContext(couponCode, context)
+    }
+
+    class RedemptionProcessor {
+        +processRedemption(couponCode, transactionContext)
+        +generateRedemptionProof(couponCode, transactionId)
+        +recordAnonymousRedemption(redemptionProof)
+        +verifyRedemptionStatus(couponCode)
+    }
+
+    class EffectivenessAnalyzer {
+        +trackRedemptionRate(offerId)
+        +analyzeUserSegments(offerId)
+        +calculateROI(offerId)
+        +generateAnonymizedReports(offerId)
+    }
+
+    class CouponConstraints {
+        +validFrom: Date
+        +validUntil: Date
+        +maxRedemptions: number
+        +productRestrictions: string[]
+        +userSegmentRestrictions: string[]
+        +validate(context)
+    }
+
+    CryptographicVerificationFramework --> CouponGenerator
+    CryptographicVerificationFramework --> CouponValidator
+    CryptographicVerificationFramework --> RedemptionProcessor
+    CryptographicVerificationFramework --> EffectivenessAnalyzer
+    CouponGenerator --> CouponConstraints
+    CouponValidator --> CouponConstraints

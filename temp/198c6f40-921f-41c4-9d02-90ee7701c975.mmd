@@ -1,0 +1,53 @@
+classDiagram
+    class AgentNode {
+        id: String
+        name: String
+        capabilities: String[]
+        status: String
+        performance: Object
+        model: String
+        provider: String
+        last_active: DateTime
+    }
+    
+    class TaskNode {
+        id: String
+        description: String
+        status: String
+        created_at: DateTime
+        deadline: DateTime
+        priority: String
+        assigned_to: String[]
+        dependencies: String[]
+        subtasks: String[]
+        context_refs: String[]
+    }
+    
+    class ContextNode {
+        id: String
+        type: String
+        content: Object
+        created_by: String
+        created_at: DateTime
+        version: Number
+        access_control: String[]
+    }
+    
+    class ResultNode {
+        id: String
+        task_id: String
+        agent_id: String
+        content: String
+        confidence: Number
+        created_at: DateTime
+        supporting_evidence: Object[]
+        metadata: Object
+    }
+    
+    TaskNode --> AgentNode : assigned_to
+    TaskNode --> TaskNode : dependencies
+    TaskNode --> TaskNode : subtasks
+    TaskNode --> ContextNode : context_refs
+    ResultNode --> TaskNode : task_id
+    ResultNode --> AgentNode : agent_id
+    ContextNode --> AgentNode : created_by

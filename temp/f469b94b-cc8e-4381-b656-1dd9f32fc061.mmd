@@ -1,0 +1,55 @@
+graph TD
+    subgraph "Technical Foundation"
+        DEV[Development Environment]
+        IAF[Identity & Authentication Framework]
+        DDM[Distributed Data Management]
+        MNO[Mesh Networking & Offline Operation]
+        PPE[Privacy Policy Engine]
+        CVF[Cryptographic Verification Framework]
+    end
+
+    subgraph "LLM Agent Orchestration Framework"
+        AR[Agent Registry]
+        CMS[Context Management System]
+        TDE[Task Distribution Engine]
+        OS[Observation Store]
+        DE[Decision Engine]
+        CL[Communication Layer]
+        BRF[Business Rules Framework]
+    end
+
+    subgraph "OASIS Components"
+        UCAI[User-Centric AI Agents]
+        CCS[Cryptographic Coupon System]
+        TTP[Trusted Third-Party Services]
+        CAI[Corporate AI Agents]
+        VRS[Verified Review System]
+    end
+
+    DEV --> IAF
+    DEV --> DDM
+    DEV --> MNO
+    DEV --> PPE
+    DEV --> CVF
+
+    IAF --> AR
+    DDM --> CMS
+    DDM --> OS
+    MNO --> CL
+    PPE --> UCAI
+    CVF --> CCS
+
+    AR --> UCAI
+    AR --> CAI
+    CMS --> UCAI
+    TDE --> CAI
+    OS --> VRS
+    DE --> UCAI
+    DE --> CAI
+    CL --> TTP
+    BRF --> CAI
+
+    UCAI --> TTP
+    CCS --> TTP
+    CAI --> TTP
+    VRS --> TTP

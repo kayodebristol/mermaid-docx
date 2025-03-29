@@ -1,0 +1,42 @@
+graph TD
+    A[User] -->|Request| B[LLM Agent Orchestration]
+    B -->|Decompose Task| C[Task Distribution Engine]
+    
+    C -->|Assign Subtask| D[Agent 1]
+    C -->|Assign Subtask| E[Agent 2]
+    C -->|Assign Subtask| F[Agent 3]
+    
+    D -->|Access/Update| G[Context Management System]
+    E -->|Access/Update| G
+    F -->|Access/Update| G
+    
+    D -->|Return Result| H[Result Aggregation System]
+    E -->|Return Result| H
+    F -->|Return Result| H
+    
+    H -->|Final Result| A
+    
+    I[Agent Registry] -->|Capabilities| C
+    J[Monitoring System] -->|Observe| D
+    J -->|Observe| E
+    J -->|Observe| F
+    
+    subgraph "Decentralized GUN Infrastructure"
+        B
+        C
+        G
+        H
+        I
+        J
+    end
+    
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style B fill:#bbf,stroke:#333,stroke-width:1px
+    style C fill:#bbf,stroke:#333,stroke-width:1px
+    style D fill:#bfb,stroke:#333,stroke-width:1px
+    style E fill:#bfb,stroke:#333,stroke-width:1px
+    style F fill:#bfb,stroke:#333,stroke-width:1px
+    style G fill:#bbf,stroke:#333,stroke-width:1px
+    style H fill:#bbf,stroke:#333,stroke-width:1px
+    style I fill:#bbf,stroke:#333,stroke-width:1px
+    style J fill:#bbf,stroke:#333,stroke-width:1px

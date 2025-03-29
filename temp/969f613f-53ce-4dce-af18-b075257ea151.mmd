@@ -1,0 +1,53 @@
+classDiagram
+    class PrivacyPolicyEngine {
+        +createPolicy(userId, policyDefinition)
+        +updatePolicy(policyId, updates)
+        +validateAction(policyId, action, context)
+        +trackDataFlow(dataId, operations)
+        +generatePrivacyReport(userId)
+    }
+
+    class PolicyDefinition {
+        +policyId: string
+        +userId: string
+        +dataCategories: Map~string, PermissionLevel~
+        +thirdPartySharing: Map~string, boolean~
+        +purposeRestrictions: Map~string, boolean~
+        +retentionPeriods: Map~string, number~
+        +validate()
+    }
+
+    class PermissionLevel {
+        <<enumeration>>
+        NONE
+        READ_ONLY
+        AGGREGATE_ONLY
+        FULL_ACCESS
+    }
+
+    class PrivacyValidator {
+        +validateAgainstPolicy(action, policy)
+        +checkPurposeCompliance(purpose, policy)
+        +verifyDataMinimization(dataRequest, purpose)
+        +checkRetentionCompliance(dataCategory, timestamp, policy)
+    }
+
+    class ConsentManager {
+        +recordConsent(userId, purpose, dataCategories)
+        +verifyConsent(userId, purpose, dataCategory)
+        +revokeConsent(userId, purpose, dataCategories)
+        +getConsentRecord(userId)
+    }
+
+    class DataFlowTracker {
+        +registerDataSource(sourceId, dataCategories)
+        +trackOperation(dataId, operation, recipient)
+        +generateDataFlowGraph(dataId)
+        +detectPolicyViolations(dataFlowGraph, policy)
+    }
+
+    PrivacyPolicyEngine --> PolicyDefinition
+    PrivacyPolicyEngine --> PrivacyValidator
+    PrivacyPolicyEngine --> ConsentManager
+    PrivacyPolicyEngine --> DataFlowTracker
+    PolicyDefinition --> PermissionLevel

@@ -1,0 +1,26 @@
+graph TD
+    A[GUN Core] --> B[SEA - Security, Encryption, Authorization]
+    A --> C[RAD - Persistent Storage]
+    A --> D[AXE - Mesh Network Routing]
+    A --> E[IRIS - Messaging System]
+    
+    F[Applications] --> A
+    
+    subgraph "Core Components"
+        A
+        B
+        C
+        D
+        E
+    end
+    
+    subgraph "Applications Layer"
+        F
+    end
+    
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style B fill:#bbf,stroke:#333,stroke-width:1px
+    style C fill:#bbf,stroke:#333,stroke-width:1px
+    style D fill:#bbf,stroke:#333,stroke-width:1px
+    style E fill:#bbf,stroke:#333,stroke-width:1px
+    style F fill:#bfb,stroke:#333,stroke-width:1px

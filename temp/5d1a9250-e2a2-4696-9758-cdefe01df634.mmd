@@ -1,0 +1,43 @@
+flowchart TB
+    subgraph "Agent 1"
+        A1[Local Storage]
+        B1[Event Handler]
+        C1[Task Processor]
+    end
+    
+    subgraph "Agent 2"
+        A2[Local Storage]
+        B2[Event Handler]
+        C2[Task Processor]
+    end
+    
+    subgraph "Agent 3"
+        A3[Local Storage]
+        B3[Event Handler]
+        C3[Task Processor]
+    end
+    
+    D[GUN P2P Network]
+    
+    A1 <-->|Sync| D
+    A2 <-->|Sync| D
+    A3 <-->|Sync| D
+    
+    B1 <-->|Events| D
+    B2 <-->|Events| D
+    B3 <-->|Events| D
+    
+    C1 <-->|Results| D
+    C2 <-->|Results| D
+    C3 <-->|Results| D
+    
+    style D fill:#bbf,stroke:#333,stroke-width:2px
+    style A1 fill:#bfb,stroke:#333,stroke-width:1px
+    style A2 fill:#bfb,stroke:#333,stroke-width:1px
+    style A3 fill:#bfb,stroke:#333,stroke-width:1px
+    style B1 fill:#fbf,stroke:#333,stroke-width:1px
+    style B2 fill:#fbf,stroke:#333,stroke-width:1px
+    style B3 fill:#fbf,stroke:#333,stroke-width:1px
+    style C1 fill:#fbb,stroke:#333,stroke-width:1px
+    style C2 fill:#fbb,stroke:#333,stroke-width:1px
+    style C3 fill:#fbb,stroke:#333,stroke-width:1px
