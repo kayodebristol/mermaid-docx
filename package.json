@@ -22,13 +22,14 @@
     "pandoc-filter": "^2.2.0",
     "puppeteer": "^22.8.2",
     "sharp-cli": "^5.1.0",
-    "svg-to-png": "^4.0.0",
     "uuid": "^9.0.1"
   },
   "bin": {
     "mermaid-docx": "./mermaid-filter.js"
   },
   "devDependencies": {
-    "pandoc": "^0.2.0"
+    "mermaid": "^11.6.0",
+    "pandoc": "^0.2.0",
+    "svg-to-png": "^4.0.0"
   }
 }

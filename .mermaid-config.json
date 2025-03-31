@@ -1,0 +1,8 @@
+{
+  "puppeteerConfig": {
+    "args": ["--no-sandbox", "--disable-setuid-sandbox"]
+  },
+  "outputFormat": "png",
+  "outputDir": "/home/kbristol/mermaid-docx/temp",
+  "caption": true
+}

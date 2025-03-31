@@ -1,185 +1,188 @@
 #!/bin/bash
 
-# Ultra-simple conversion script with debug output
-# Usage: ./convert-simple.sh input.md output.docx
+# Simplified Mermaid-Docx Conversion Script
+# Uses local installations for all npm packages
 
-if [ $# -ne 2 ]; then
-  echo "Usage: $0 input.md output.docx"
-  exit 1
-fi
+set -e  # Exit on error
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOG_FILE="${SCRIPT_DIR}/mermaid-conversion.log"
+ERROR_LOG="${SCRIPT_DIR}/mermaid-filter.err"
+VERBOSE=false
+COMPLEX_MODE=false
 
-INPUT="$1"
-OUTPUT="$2"
+# Function for logging
+log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" | tee -a "$LOG_FILE"
+}
 
-# Check if input file exists
-if [ ! -f "$INPUT" ]; then
-  echo "Error: Input file '$INPUT' does not exist"
-  exit 1
-fi
+# Function for verbose logging
+verbose_log() {
+    if [ "$VERBOSE" = true ]; then
+        log "$1"
+    fi
+}
 
-# Ensure output directory exists
-OUTPUT_DIR=$(dirname "$OUTPUT")
-if [ ! -d "$OUTPUT_DIR" ] && [ "$OUTPUT_DIR" != "." ]; then
-  echo "Creating output directory: $OUTPUT_DIR"
-  mkdir -p "$OUTPUT_DIR" || { echo "Failed to create output directory"; exit 1; }
-fi
+# Process command line options
+while getopts ":vc" opt; do
+  case $opt in
+    v)
+      VERBOSE=true
+      ;;
+    c)
+      COMPLEX_MODE=true
+      log "Complex mode enabled (for large/problematic documents)"
+      ;;
+    \?)
+      log "Invalid option: -$OPTARG"
+      exit 1
+      ;;
+  esac
+done
+shift $((OPTIND-1))
 
-# Get absolute paths for better diagnostics
-ABS_INPUT=$(readlink -f "$INPUT")
-ABS_OUTPUT=$(readlink -f "$OUTPUT_DIR")/$(basename "$OUTPUT")
-
-echo "Converting $ABS_INPUT to $ABS_OUTPUT"
-
-# Check for required tools
-if ! command -v node &> /dev/null; then
-  echo "Error: Node.js is required but not installed"
-  exit 1
-fi
-
-# Check required JavaScript files
-for JSFILE in "./mermaid-filter.js" "./render-mermaid.js"; do
-  if [ ! -f "$JSFILE" ]; then
-    echo "Error: $JSFILE not found in current directory"
+# Check if we have the required arguments
+if [ "$#" -ne 2 ]; then
+    log "Usage: $0 [-v] [-c] input.md output.docx"
+    log "Options:"
+    log "  -v  Verbose mode (more detailed logs)"
+    log "  -c  Complex mode (for large documents with many diagrams)"
     exit 1
-  fi
-  if [ ! -x "$JSFILE" ]; then
-    echo "Setting execute permissions for $JSFILE"
-    chmod +x "$JSFILE"
-  fi
-done
-
-# Check for required npm packages with improved error handling
-echo "Checking npm packages..."
-for PKG in "uuid" "sharp-cli" "svg-to-png"; do
-  if ! npm list --depth=0 2>/dev/null | grep -q "$PKG"; then
-    echo "Installing required npm package: $PKG"
-    npm install --save "$PKG" || echo "Warning: Failed to install $PKG, will try alternatives"
-  fi
-done
-
-# Also install globally for npx usage
-echo "Ensuring svg-to-png is available for npx..."
-if ! which svg-to-png &>/dev/null; then
-  npm install -g svg-to-png || echo "Warning: Could not install svg-to-png globally, will use fallbacks"
 fi
 
-# Install sharp as a fallback for image conversion
-if ! npm list --depth=0 2>/dev/null | grep -q "sharp"; then
-  echo "Installing sharp as fallback for image conversion"
-  npm install --save sharp
+INPUT_FILE="$1"
+OUTPUT_FILE="$2"
+
+# Ensure input file exists
+if [ ! -f "$INPUT_FILE" ]; then
+    log "Error: Input file '$INPUT_FILE' not found"
+    exit 1
 fi
 
-# Create a simple fallback SVG conversion script
-cat > ./temp/svg-convert.js << 'EOF'
-#!/usr/bin/env node
-const fs = require('fs');
-const path = require('path');
-const sharp = require('sharp');
+log "Converting $INPUT_FILE to $OUTPUT_FILE"
 
-async function convertSvgToPng(svgPath, pngPath) {
-  try {
-    // Read the SVG file
-    const svgBuffer = fs.readFileSync(svgPath);
-    
-    // Convert to PNG using sharp
-    await sharp(svgBuffer)
-      .png()
-      .toFile(pngPath);
-    
-    console.log(`Successfully converted ${svgPath} to ${pngPath}`);
-    return true;
-  } catch (error) {
-    console.error(`Error converting SVG to PNG: ${error.message}`);
-    return false;
-  }
-}
+# Initialize project if needed
+if [ ! -f "${SCRIPT_DIR}/package.json" ]; then
+    log "Initializing npm project..."
+    (cd "$SCRIPT_DIR" && npm init -y) >> "$LOG_FILE" 2>&1
+fi
 
-// Main function
-async function main() {
-  if (process.argv.length < 4) {
-    console.error('Usage: node svg-convert.js <input-svg> <output-png>');
-    process.exit(1);
-  }
-  
-  const svgPath = process.argv[2];
-  const pngPath = process.argv[3];
-  
-  try {
-    const success = await convertSvgToPng(svgPath, pngPath);
-    process.exit(success ? 0 : 1);
-  } catch (error) {
-    console.error(`Conversion failed: ${error.message}`);
-    process.exit(1);
-  }
-}
+# Install required packages locally if they don't exist
+if [ ! -d "${SCRIPT_DIR}/node_modules/mermaid-filter" ]; then
+    log "Installing mermaid-filter locally..."
+    (cd "$SCRIPT_DIR" && npm install --save-dev mermaid-filter) >> "$LOG_FILE" 2>&1
+fi
 
-main();
-EOF
+if [ ! -d "${SCRIPT_DIR}/node_modules/svg-to-png" ]; then
+    log "Installing svg-to-png locally..."
+    (cd "$SCRIPT_DIR" && npm install --save-dev svg-to-png) >> "$LOG_FILE" 2>&1
+fi
 
-chmod +x ./temp/svg-convert.js
-
-# Clean any old temp files
-echo "Cleaning old temp files..."
-rm -f ./temp/*.svg ./temp/*.png ./temp/*.mmd ./temp/*.html
+# Install mermaid itself which is required by mermaid-filter
+if [ ! -d "${SCRIPT_DIR}/node_modules/mermaid" ]; then
+    log "Installing mermaid package..."
+    (cd "$SCRIPT_DIR" && npm install --save-dev mermaid) >> "$LOG_FILE" 2>&1
+fi
 
 # Create temp directory if it doesn't exist
-mkdir -p ./temp
+TEMP_DIR="${SCRIPT_DIR}/temp"
+mkdir -p "$TEMP_DIR"
 
-# Extract mermaid code blocks first to process them separately
-echo "Extracting and pre-processing mermaid diagrams..."
-grep -n "^\`\`\`mermaid" -A 100 "$INPUT" | awk '/^\`\`\`mermaid/,/^\`\`\`/' | grep -v "^\`\`\`" > ./temp/all_diagrams.mmd
+# Clean old temp files
+log "Cleaning old temp files..."
+rm -f "$TEMP_DIR"/*.svg "$TEMP_DIR"/*.png
 
-# Count diagrams
-DIAGRAM_COUNT=$(grep -c "^graph\|^flowchart\|^sequenceDiagram\|^classDiagram\|^stateDiagram\|^gantt\|^pie\|^erDiagram" ./temp/all_diagrams.mmd)
-echo "Found $DIAGRAM_COUNT diagrams to pre-render"
+# Create mermaid-filter configuration file
+log "Creating mermaid-filter configuration..."
+cat > "${SCRIPT_DIR}/.mermaid-config.json" << EOF
+{
+  "puppeteerConfig": {
+    "args": ["--no-sandbox", "--disable-setuid-sandbox"]
+  },
+  "outputFormat": "png",
+  "outputDir": "${TEMP_DIR}",
+  "caption": true
+}
+EOF
 
-# Increase timeout for conversion based on diagram count
-TIMEOUT=$((120 + DIAGRAM_COUNT * 10))
-echo "Setting conversion timeout to $TIMEOUT seconds"
+# Create a detailed debug log
+DEBUG_LOG="${SCRIPT_DIR}/filter-debug.log"
+log "Debug information will be written to $DEBUG_LOG"
 
-# Try pandoc conversion with our filter
-echo "Running conversion with mermaid filter (debug enabled)..."
-export SVG_CONVERTER="./temp/svg-convert.js"
-DEBUG=true timeout ${TIMEOUT}s pandoc \
-  --filter ./mermaid-filter.js \
-  -f markdown \
-  -t docx \
-  -o "$OUTPUT" \
-  "$INPUT" \
-  2>&1 | tee conversion.log
-
-PANDOC_STATUS=${PIPESTATUS[0]}
-
-if [ $PANDOC_STATUS -eq 124 ] || [ $PANDOC_STATUS -eq 137 ]; then
-  echo "Error: Conversion timed out after $TIMEOUT seconds. Check conversion.log and ./temp/filter-debug.log for details."
-  exit 1
-fi
-
-# Check if conversion was successful and if the output file was created
-if [ $PANDOC_STATUS -eq 0 ]; then
-  if [ -f "$OUTPUT" ]; then
-    echo "Conversion completed successfully! Output file created at: $OUTPUT"
-    ls -la "$OUTPUT"
-  else
-    echo "Error: Pandoc reported success but output file was not created."
-    echo "Trying without the filter as fallback..."
+# For complex files, use pre-processing approach with the Node.js helper
+if [ "$COMPLEX_MODE" = true ]; then
+    # Use the Node.js helper script for complex files
+    log "Using complex mode with Node.js pre-processing..."
+    DIAGRAMS_DIR="${TEMP_DIR}/img"
+    mkdir -p "$DIAGRAMS_DIR"
     
-    # Try without the filter as fallback
-    pandoc -f markdown -t docx -o "$OUTPUT" "$INPUT"
-    
-    if [ -f "$OUTPUT" ]; then
-      echo "Fallback conversion successful (without mermaid diagrams)."
-    else
-      echo "Fallback conversion also failed."
+    if [ ! -f "${SCRIPT_DIR}/process-mermaid.js" ]; then
+        log "Error: Required helper script process-mermaid.js not found"
+        exit 1
     fi
-  fi
+    
+    # Process the file with the Node.js helper
+    log "Pre-processing diagrams with Node.js helper..."
+    PROCESSED_OUTPUT="${TEMP_DIR}/processed.md"
+    node "${SCRIPT_DIR}/process-mermaid.js" "$INPUT_FILE" "$PROCESSED_OUTPUT" "$DIAGRAMS_DIR" > "$DEBUG_LOG" 2>&1 || {
+        log "Error during diagram pre-processing. Check $DEBUG_LOG for details."
+        exit 1
+    }
+    
+    # Convert the processed file to DOCX
+    log "Converting pre-processed markdown to DOCX..."
+    pandoc "$PROCESSED_OUTPUT" --standalone --resource-path="$TEMP_DIR" -o "$OUTPUT_FILE" >> "$DEBUG_LOG" 2>&1 || {
+        log "Error during pandoc conversion. Falling back to fallback script..."
+        if [ -f "${SCRIPT_DIR}/fallback-simple.sh" ]; then
+            bash "${SCRIPT_DIR}/fallback-simple.sh" "$INPUT_FILE" "$OUTPUT_FILE"
+        else
+            log "Fallback script not found. Conversion failed."
+            exit 1
+        fi
+    }
 else
-  echo "Conversion failed with exit code $PANDOC_STATUS. Check conversion.log for details."
+    # For normal/simple files, use the original approach
+    log "Running conversion with mermaid filter (standard mode)..."
+    export NODE_PATH="${SCRIPT_DIR}/node_modules"
+    export MERMAID_FILTER_FORMAT="png"
+    export MERMAID_FILTER_OUTPUT_DIR="${TEMP_DIR}"
+    
+    # Run the conversion using local mermaid-filter
+    if [ "$VERBOSE" = true ]; then
+        # Verbose mode uses a two-step approach
+        log "Processing in verbose mode with intermediate HTML..."
+        TEMP_HTML="${TEMP_DIR}/temp-output.html"
+        
+        # Step 1: Convert markdown to HTML with mermaid diagrams
+        pandoc "$INPUT_FILE" --filter "${SCRIPT_DIR}/node_modules/.bin/mermaid-filter" -o "$TEMP_HTML" 2> "$ERROR_LOG" || {
+            log "Error in markdown to HTML conversion. Check $ERROR_LOG for details."
+            exit 1
+        }
+        
+        # Step 2: Convert HTML to DOCX
+        pandoc "$TEMP_HTML" -o "$OUTPUT_FILE" 2>> "$ERROR_LOG" || {
+            log "Error in HTML to DOCX conversion. Check $ERROR_LOG for details."
+            exit 1
+        }
+    else
+        # Standard mode - direct conversion
+        pandoc "$INPUT_FILE" --standalone --filter "${SCRIPT_DIR}/node_modules/.bin/mermaid-filter" -o "$OUTPUT_FILE" 2> "$ERROR_LOG"
+        
+        # Check for errors
+        if [ $? -ne 0 ]; then
+            log "Error during conversion. Check $ERROR_LOG for details."
+            exit 1
+        fi
+    fi
 fi
 
-# Check for debug logs from the filter
-if [ -f "./temp/filter-debug.log" ]; then
-  echo "Filter debug log available at: ./temp/filter-debug.log"
-  echo "Tail of debug log:"
-  tail -n 20 ./temp/filter-debug.log
+# Verify the output file exists and has content
+if [ ! -f "$OUTPUT_FILE" ]; then
+    log "Error: Output file not created"
+    exit 1
+elif [ ! -s "$OUTPUT_FILE" ]; then
+    log "Warning: Output file is empty"
+else
+    # Count diagrams in output directory
+    DIAGRAM_COUNT=$(find "$TEMP_DIR" -name "*.png" | wc -l)
+    log "Conversion completed successfully! Output file: $OUTPUT_FILE (with $DIAGRAM_COUNT diagrams)"
 fi
