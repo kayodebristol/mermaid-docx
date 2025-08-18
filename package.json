@@ -10,8 +10,9 @@
     "convert:all": "find . -name '*.md' -type f | while read file; do outfile=\"${file%.md}.docx\"; echo \"Converting $file to $outfile\"; npm run convert:file \"$file\" \"$outfile\"; done",
     "convert:folder": "bash -c 'folder=\"$1\"; recurse=\"$2\"; depth=\"-maxdepth 1\"; if [ \"$recurse\" = \"--recurse\" ]; then depth=\"\"; fi; find \"$folder\" -name \"*.md\" -type f $depth | while read file; do outfile=\"${file%.md}.docx\"; echo \"Converting $file to $outfile\"; npm run convert:file \"$file\" \"$outfile\"; done' --",
     "postinstall": "puppeteer install",
-    "setup": "npm install && puppeteer install",
-    "find-chrome": "node -e \"const fs=require('fs');const paths=['/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser','/snap/bin/chromium','/usr/bin/brave-browser','/usr/bin/microsoft-edge'];for(const p of paths){if(fs.existsSync(p)){console.log(p+' exists');}else{console.log(p+' not found');}}\""
+    "setup": "npm install && puppeteer install && npm run install:pandoc",
+    "find-chrome": "node -e \"const fs=require('fs');const paths=['/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser','/snap/bin/chromium','/usr/bin/brave-browser','/usr/bin/microsoft-edge'];for(const p of paths){if(fs.existsSync(p)){console.log(p+' exists');}else{console.log(p+' not found');}}\"",
+    "install:pandoc": "winget install --id=JohnMacFarlane.Pandoc -e --silent"
   },
   "keywords": [],
   "author": "",
