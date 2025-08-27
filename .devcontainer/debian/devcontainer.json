@@ -1,0 +1,23 @@
+{
+  "name": "mermaid-docx (Debian)",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {
+      "VARIANT": "22-bullseye"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bierner.markdown-mermaid",
+        "yzhang.markdown-all-in-one"
+      ]
+    }
+  },
+  "containerEnv": {
+    "PUPPETEER_SKIP_DOWNLOAD": "1",
+    "PUPPETEER_EXECUTABLE_PATH": "/usr/bin/chromium"
+  },
+  "postCreateCommand": "npm ci",
+  "remoteUser": "node"
+}

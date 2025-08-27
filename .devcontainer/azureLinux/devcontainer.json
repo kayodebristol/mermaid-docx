@@ -1,0 +1,27 @@
+{
+  "name": "mermaid-docx (Azure Linux)",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "postCreateCommand": "npm ci",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bierner.markdown-mermaid",
+        "yzhang.markdown-all-in-one",
+        "NuclleaR.vscode-extension-auto-import",
+        "christian-kohler.npm-intellisense",
+        "dbaeumer.vscode-eslint",
+        "FabianReyes.smart-json-schema",
+        "mads-hartmann.bash-ide-vscode",
+        
+
+
+      ]
+    }
+  },
+  "containerEnv": {
+    // Let Puppeteer download a compatible Chromium if system one isn't available
+    "PUPPETEER_SKIP_DOWNLOAD": "0"
+  }
+}

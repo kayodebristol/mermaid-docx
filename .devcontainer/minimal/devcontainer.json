@@ -1,0 +1,5 @@
+{
+  "name": "mermaid-docx (Minimal Node)",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bullseye",
+  "postCreateCommand": "npm ci"
+}

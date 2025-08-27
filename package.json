@@ -4,7 +4,6 @@
   "description": "Convert markdown with mermaid diagrams to DOCX",
   "main": "mermaid-filter.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "convert": "pandoc --filter ./mermaid-filter.js -f markdown -t docx -o",
     "convert:file": "pandoc --filter ./mermaid-filter.js -f markdown -t docx -o \"$2\" \"$1\"",
     "convert:all": "find . -name '*.md' -type f | while read file; do outfile=\"${file%.md}.docx\"; echo \"Converting $file to $outfile\"; npm run convert:file \"$file\" \"$outfile\"; done",
@@ -12,10 +11,10 @@
     "postinstall": "puppeteer install",
     "setup": "npm install && puppeteer install && npm run install:pandoc",
     "find-chrome": "node -e \"const fs=require('fs');const paths=['/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser','/snap/bin/chromium','/usr/bin/brave-browser','/usr/bin/microsoft-edge'];for(const p of paths){if(fs.existsSync(p)){console.log(p+' exists');}else{console.log(p+' not found');}}\"",
-    "install:pandoc": "winget install --id=JohnMacFarlane.Pandoc -e --silent"
+    "install:pandocForWindows": "winget install --id=JohnMacFarlane.Pandoc -e --silent"
   },
   "keywords": [],
-  "author": "",
+  "author": "kbristol@microsoft.com",
   "license": "ISC",
   "dependencies": {
     "@mermaid-js/mermaid-cli": "^10.4.0",
@@ -31,6 +30,6 @@
   "devDependencies": {
     "mermaid": "^11.6.0",
     "pandoc": "^0.2.0",
-    "svg-to-png": "^4.0.0"
+    "svg-to-png": "^3.0.0"
   }
 }
