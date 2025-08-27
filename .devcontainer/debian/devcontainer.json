@@ -10,7 +10,12 @@
     "vscode": {
       "extensions": [
         "bierner.markdown-mermaid",
-        "yzhang.markdown-all-in-one"
+        "yzhang.markdown-all-in-one",
+        "NuclleaR.vscode-extension-auto-import",
+        "christian-kohler.npm-intellisense",
+        "dbaeumer.vscode-eslint",
+        "FabianReyes.smart-json-schema",
+        "mads-hartmann.bash-ide-vscode"
       ]
     }
   },

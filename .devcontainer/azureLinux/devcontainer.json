@@ -13,10 +13,7 @@
         "christian-kohler.npm-intellisense",
         "dbaeumer.vscode-eslint",
         "FabianReyes.smart-json-schema",
-        "mads-hartmann.bash-ide-vscode",
-        
-
-
+        "mads-hartmann.bash-ide-vscode"
       ]
     }
   },
