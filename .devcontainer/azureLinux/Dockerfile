@@ -1,14 +1,15 @@
 # Azure Linux (CBL‑Mariner) base
-FROM mcr.microsoft.com/azurelinux/base/core:2.0
+FROM mcr.microsoft.com/azurelinux/base/core:3.0
 
 # Install essentials with tdnf (Azure Linux package manager)
 RUN tdnf -y update && \
     tdnf -y install \
       ca-certificates \
       curl tar gzip xz \
-      git \
-      nodejs npm \
-      fontconfig dejavu-fonts liberation-fonts && \
+      git gawk\
+      nodejs nodejs-npm \
+      fontconfig  \
+      dejavu-sans-fonts dejavu-sans-mono-fonts dejavu-serif-fonts && \
     tdnf clean all
 
 # Install pandoc (generic Linux tarball)

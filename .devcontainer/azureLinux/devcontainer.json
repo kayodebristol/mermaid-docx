@@ -1,5 +1,5 @@
 {
-  "name": "mermaid-docx (Azure Linux)",
+  "name": "mermaid-docx (Azure Linux v3)",
   "build": {
     "dockerfile": "Dockerfile"
   },
